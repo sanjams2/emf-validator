@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <title>hello-wasm example</title>
+  </head>
+  <body>
+    <h1>EMF Validator</h1>
+    <div>
+        <textarea id="jsontext" name="jsontext" rows="35" cols="100"></textarea>
+        <br/>
+        <button disabled="true" type="button" id="submit-button" onclick="validate_trampoline()">Submit</button>
+    </div>
+    <script type="module">
+      import init, { validate } from "./pkg/emf_validator.js";
+      init().then(() => {
+        var button = document.getElementById('submit-button');
+        button.disabled = false;
+        button.onclick = function() {
+          var text = document.getElementById('jsontext').value;
+          try {
+            validate(text);
+            alert("Json is valid!");
+          } catch (e) {
+            alert("Error with schema: " + e);
+          }
+        }
+      });
+      function validate_trampoline() {
+        validate(document.getElementById('jsontext').value);
+      }
+    </script>
+  </body>
+</html>
+

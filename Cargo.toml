@@ -1,0 +1,17 @@
+[package]
+name = "emf-validator"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+# Need to explicitly add getrandom's 'js' feature for it to compile to web-assembly
+# getrandom is a jsonschema dependency
+getrandom = { version = "0.2.8", features = ["js" ] }
+# by default, json schema uses I/O (for fetching remote schemas) so disable default features
+jsonschema = { version = "0.16.1", default-features = false, features = ["draft202012"] }
+wasm-bindgen = "0.2.83"
+serde_json = "1.0.87"
+lazy_static = "1.4.0"
