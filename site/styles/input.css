@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.unvalidated-textarea {
+    @apply rounded-md border-zinc-600;
+}
+
+.invalid-textarea {
+    @apply rounded-t-md border-red-600 dark:border-red-800;
+}
+
+.valid-textarea {
+    @apply rounded-t-md border-green-600 dark:border-green-800;
+}
+
+a {
+    @apply text-sky-400;
+}

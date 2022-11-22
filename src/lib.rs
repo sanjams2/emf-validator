@@ -17,9 +17,18 @@ lazy_static!{
 
 #[wasm_bindgen]
 pub fn validate(json: &str) -> Result<(), String> {
+    if json.len() < 2 {
+        return Err("Invalid size".to_string());
+    }
     let json: Value = Value::from_str(json).map_err(|e| e.to_string())?;
     SCHEMA.validate(&json)
-        .map_err(|e| e.map(|ie| ie.to_string()).collect())
+        .map_err(|e|
+            e.map(|ie| {
+                let path = ie.instance_path.to_string();
+                let path = if path.len() > 0 { path } else { "/".to_string() };
+                format!("{} [Path: {}]", ie.to_string(), path)
+            }).collect::<Vec<String>>().join(", ")
+        )
 }
 
 #[cfg(test)]
@@ -51,5 +60,35 @@ mod tests {
             "pageversion": "1.0.2"
         }"#;
         validate(json).expect("wrong json");
+    }
+
+    #[test]
+    fn it_fails() {
+        let json = r#"{
+            "_aws":{
+                "Timestap": 1666917984381,
+                "CloudWatchMetrics": [
+                    {
+                        "Namespace": "MyAppMetricNamespace",
+                        "Dimesions": [
+                            []
+                        ],
+                        "Metris": [
+                            {
+                                "Name": "page2view"
+                            }
+                        ]
+                    }
+                ]
+            }
+        }"#;
+        let res = validate(json);
+        match res {
+            Err(e) => {
+                assert!(e.contains("\"Dimensions\" is a required property"), "Error should contain: \"Dimensions\" is a required property");
+                assert!(e.contains("\"Metrics\" is a required property"), "Error should contain: \"Metrics\" is a required property");
+            },
+            Ok(_) => assert!(false, "validation should fail")
+        }
     }
 }

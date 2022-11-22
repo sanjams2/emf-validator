@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <title>EMF Validator</title>
+  <link href="./styles/main.min.css" rel="stylesheet" />
+  </head>
+  <body class="bg-zinc-100 dark:bg-slate-800">
+    <div class="container mx-auto text-center md:h-screen h-[750px] w-screen pt-2 dark:text-zinc-200">
+        <h1 class="text-5xl text-secondary mt-5">EMF Validator</h1>
+        <p class="pt-2">Validate that a JSON object conforms to the
+            <a target="_blank" href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Embedded_Metric_Format_Specification.html">AWS Embedded Metrics Format schema</a>.
+        </p>
+        <div class="h-3/4 lg:w-2/3 w-5/6 pt-3 m-auto">
+            <div class="h-full w-full m-auto">
+              <textarea class="border-2 unvalidated-textarea dark:bg-slate-300 dark:text-black border-solid h-5/6 w-full pb-0" id="jsontext" name="jsontext"></textarea>
+              <div id="valid-answer" class="flex justify-center items-center w-full h-12 hidden border-2 rounded-b-md border-green-600 dark:border-green-800 bg-green-400 dark:bg-green-800 mt-[-5px]">JSON is valid</div>
+              <div id="invalid-answer" class="flex justify-center items-center w-full h-12 hidden border-2 rounded-b-md border-red-600 dark:border-red-800 bg-red-400 dark:bg-red-800 mt-[-5px]">
+                <p>Invalid JSON: <span id="err-message">Test Test Test</span></p>
+              </div>
+              <button class="bg-zinc-600 text-white w-96 rounded-md mt-3 h-10" disabled="true" type="button" id="submit-button" onclick="validate_trampoline()">Submit</button>
+            </div>
+        </div>
+        <div>
+          <p class="absolute inset-x-0 bottom-0 pb-1 text-sm">
+            Built using <a href="https://github.com/rustwasm/wasm-bindgen" target="_blank">wasm-bindgen</a>
+            and <a href="https://tailwindcss.com/" target="_blank">Tailwind CSS</a>.
+            Code hosted on <a href="https://github.com/sanjams2" target="_blank">Github</a>
+          </p>
+        </div>
+    </div>
+  </body>
+  <footer>
+    <script type="module">
+      import init, { validate } from "./pkg/emf_validator.js";
+
+      const inputArea = document.getElementById('jsontext');
+      const validAnswerCont = document.getElementById("valid-answer");
+      const invalidAnswerCont = document.getElementById("invalid-answer");
+      const errMessageCont = document.getElementById("err-message");
+
+      function replaceClass(elem, replaceWith, toBeReplaced) {
+          toBeReplaced.forEach((cls) => {
+              elem.classList.remove(cls);
+          });
+          elem.classList.add(replaceWith);
+      }
+
+      function makeVisible(elem) {
+          if (elem.classList.contains("hidden")) {
+              elem.classList.remove("hidden");
+          }
+      }
+
+      function makeInvisible(elem) {
+          if (!elem.classList.contains("hidden")) {
+              elem.classList.add("hidden");
+          }
+      }
+
+      inputArea.oninput = function(ev) {
+          replaceClass(inputArea, 'unvalidated-textarea', ['invalid-textarea', 'valid-textarea']);
+          makeInvisible(invalidAnswerCont);
+          makeInvisible(validAnswerCont);
+      };
+
+      init().then(() => {
+        const button = document.getElementById('submit-button');
+        button.disabled = false;
+        button.onclick = function() {
+
+          try {
+            validate(inputArea.value);
+            replaceClass(inputArea, 'valid-textarea', ['invalid-textarea', 'unvalidated-textarea']);
+            makeVisible(validAnswerCont);
+            makeInvisible(invalidAnswerCont);
+          } catch (e) {
+            replaceClass(inputArea, 'invalid-textarea', ['valid-textarea', 'unvalidated-textarea']);
+            makeVisible(invalidAnswerCont);
+            makeInvisible(validAnswerCont);
+            errMessageCont.textContent = e.toString();
+          }
+        }
+      });
+
+      function validate_trampoline() {
+        validate(document.getElementById('jsontext').value);
+      }
+    </script>
+  </footer>
+</html>
+
