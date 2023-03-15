@@ -3,3 +3,5 @@
 /.idea
 /bin
 site/pkg/*
+site/styles/main.css
+site/styles/main.min.css
