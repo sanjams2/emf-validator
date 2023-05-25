@@ -42,6 +42,12 @@
       const invalidAnswerCont = document.getElementById("invalid-answer");
       const errMessageCont = document.getElementById("err-message");
 
+      function recordMetric() {
+        var req = new XMLHttpRequest();
+        req.open('HEAD', "http://emf-validator-analytics.s3.us-east-1.amazonaws.com/metrics/v1/validate");
+        req.send(null);
+      }
+
       function replaceClass(elem, replaceWith, toBeReplaced) {
           toBeReplaced.forEach((cls) => {
               elem.classList.remove(cls);
@@ -83,6 +89,8 @@
             makeInvisible(validAnswerCont);
             errMessageCont.textContent = e.toString();
           }
+
+          recordMetric();
         }
       });
 
