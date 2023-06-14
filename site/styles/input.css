@@ -17,3 +17,11 @@
 a {
     @apply text-sky-400;
 }
+
+html, body {
+    overflow-x: hidden;
+}
+
+body {
+    position: relative;
+}
