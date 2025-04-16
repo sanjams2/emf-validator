@@ -1,6 +1,6 @@
 
 AWS_REGION=us-east-1
-AWS_PROFILE=emf-validator
+AWS_PROFILE=aws-prsn
 STACK_NAME=emf-validator-website
 DOMAIN_NAME=emfvalidator.com
 
@@ -10,6 +10,9 @@ build:
 wasm-pack:
 	wasm-pack build --target web --release --out-dir site/pkg
 
+wasm-pack-debug:
+	wasm-pack build --target web --debug --out-dir site/pkg
+
 install-tailwind:
 	curl -sL https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-macos-x64 -o bin/tailwindcss
 	chmod +x bin/tailwindcss
@@ -17,7 +20,7 @@ install-tailwind:
 tailwind:
 	./bin/tailwindcss -i site/styles/input.css -o site/styles/main.min.css --config etc/tailwind.config.js --minify
 
-site-release: wasm-pack tailwind
+site-release: wasm-pack-debug tailwind
 
 tailwind-watch:
 	./bin/tailwindcss -i site/styles/input.css -o site/styles/main.min.css --config etc/tailwind.config.js --watch --minify
